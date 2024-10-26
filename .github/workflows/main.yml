@@ -15,7 +15,12 @@ jobs:
 
       - name: Set up Google Cloud SDK
         run: |
-          echo "${{ secrets.YOUR_GITHUB_SECRET_NAME }}" | tr -d '\r' > $HOME/gcloud-service-key.json
+          echo "${{ secrets.GCP_SA_KEY }}" | tr -d '\r' > $HOME/gcloud-service-key.json
+          
+      - name: Display JSON file contents (for debugging)
+        run: |
+          cat $HOME/gcloud-service-key.json
+          echo "End of JSON file contents"
 
       - name: Authenticate with Google Cloud
         run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
