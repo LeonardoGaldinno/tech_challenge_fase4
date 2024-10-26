@@ -13,14 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Check if secret is set
-      run: |
-        echo "GCP_SA_KEY: ${GCP_SA_KEY:-not set}"
-        if [ -z "${{ secrets.GCP_SA_KEY }}" ]; then
-          echo "Secret GCP_SA_KEY is not set."
-          exit 1
-        fi
-
     - name: Decode service account key
       run: |
         echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > $HOME/gcloud-service-key.json
@@ -28,11 +20,6 @@ jobs:
           echo "Failed to create service account key file."
           exit 1
         fi
-        echo "Service account key file created successfully."
-        cat $HOME/gcloud-service-key.json  # Debug: Output the content of the file
-
-    - name: Set GOOGLE_APPLICATION_CREDENTIALS
-      run: echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud-service-key.json" >> $GITHUB_ENV
 
     - name: Authenticate to Google Cloud
       run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
