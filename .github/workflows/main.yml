@@ -15,7 +15,7 @@ jobs:
 
       - name: Create service account key file
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-service-key.json
+          echo "${{ secrets.GCP_SA_KEY }}" | sed 's/^/"/;s/$/"/;s/: /": "/g;s/, /", "/g;s/\\n/\\n/g' > $HOME/gcloud-service-key.json
           echo "Service account key file created."
 
       - name: Check JSON content with line numbers
