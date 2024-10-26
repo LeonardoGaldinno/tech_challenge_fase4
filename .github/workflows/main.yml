@@ -20,7 +20,8 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
 
     - name: Authenticate to Google Cloud
-      run: printf "%s" "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-service-key.json
+      run: |
+        echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > $HOME/gcloud-service-key.json
 
     - name: Set GOOGLE_APPLICATION_CREDENTIALS
       run: echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud-service-key.json" >> $GITHUB_ENV
