@@ -14,7 +14,8 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Google Cloud SDK
-        run: echo "${{ secrets.YOUR_GITHUB_SECRET_NAME }}" > $HOME/gcloud-service-key.json
+        run: |
+          echo "${{ secrets.YOUR_GITHUB_SECRET_NAME }}" | tr -d '\r' > $HOME/gcloud-service-key.json
 
       - name: Authenticate with Google Cloud
         run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
