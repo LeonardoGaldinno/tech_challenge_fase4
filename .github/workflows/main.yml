@@ -13,6 +13,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Install jq
+      run: sudo apt-get install -y jq
+
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.2.0
       with:
@@ -20,7 +23,7 @@ jobs:
 
     - name: Authenticate to Google Cloud
       run: |
-        echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > $HOME/gcloud-service-key.json
+        echo "${{ secrets.GCP_SA_KEY }}" | jq '.' > $HOME/gcloud-service-key.json
 
     - name: Set GOOGLE_APPLICATION_CREDENTIALS
       run: echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud-service-key.json" >> $GITHUB_ENV
