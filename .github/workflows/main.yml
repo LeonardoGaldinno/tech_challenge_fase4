@@ -13,16 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Check available memory
-        run: |
-          echo "Available memory:"
-          free -h
-
       - name: Create service account key file
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | sed 's/\\n/\n/g' > $HOME/temp-key.json
-          jq -R 'split("\n") | map(select(length > 0)) | map(gsub("^\\s+|\\s+$"; "")) | map(gsub(": \\s*"; ": ")) | map(gsub(",\\s*$"; "")) | map(gsub("^"; "\"")) | map(gsub("$"; "\"")) | join(", ") | "{" + . + "}"' $HOME/temp-key.json > $HOME/gcloud-service-key.json
-          rm $HOME/temp-key.json
+          echo "${{ secrets.GCP_SA_KEY }}" | sed 's/\\n/\n/g' | jq -R 'fromjson? | select(. != null)' > $HOME/gcloud-service-key.json
+          if [ $? -ne 0 ]; then
+            echo "Failed to create service account key file."
+            exit 1
+          fi
           echo "Service account key file created."
 
       - name: Check JSON content with line numbers
