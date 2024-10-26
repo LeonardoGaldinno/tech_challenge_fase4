@@ -1,4 +1,4 @@
-name: Deploy to Google Cloud
+name: Deploy
 
 on:
   push:
@@ -10,48 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Create service account key file
-        run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | jq -R 'fromjson? | select(. != null)' > $HOME/gcloud-service-key.json || { echo "Failed to create service account key file."; exit 1; }
-          if [ ! -s $HOME/gcloud-service-key.json ]; then
-            echo "Service account key file is empty."
-            exit 1
-          fi
-          echo "Service account key file created."
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.2.0
+      with:
+        version: 'latest'
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Check JSON content with line numbers
-        run: |
-          echo "Contents of gcloud-service-key.json with line numbers:"
-          nl -ba $HOME/gcloud-service-key.json
+    - name: Authenticate to Google Cloud
+      run: echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-service-key.json
 
-      - name: Validate JSON format
-        run: |
-          echo "Validating JSON format..."
-          if ! jq empty $HOME/gcloud-service-key.json; then
-            echo "Invalid JSON format."
-            exit 1
-          fi
-          echo "JSON format is valid."
+    - name: Set GOOGLE_APPLICATION_CREDENTIALS
+      run: echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud-service-key.json" >> $GITHUB_ENV
 
-      - name: Authenticate with Google Cloud
-        run: |
-          echo "Authenticating with Google Cloud..."
-          gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
+    - name: Configure gcloud
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud-service-key.json
+      run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
 
-      - name: Set Google Cloud project
-        run: |
-          echo "Setting Google Cloud project..."
-          gcloud config set project neural-journey-377617
+    - name: Set Google Cloud Project
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud-service-key.json
+      run: gcloud config set project neural-journey-377617
 
-      - name: Deploy application
-        run: |
-          echo "Deploying application..."
-          # Add your deployment commands here
-
-      - name: Cleanup
-        run: |
-          echo "Cleaning up..."
-          rm $HOME/gcloud-service-key.json
+    - name: Deploy to Google Cloud
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud-service-key.json
+      run: |
+        # Add your deployment commands here
+        echo "Deploying to Google Cloud..."
