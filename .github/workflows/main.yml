@@ -15,20 +15,12 @@ jobs:
 
       - name: Create service account key file
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | sed 's/\\n/\n/g' | jq -R 'fromjson? | select(. != null)' > $HOME/gcloud-service-key.json
-          if [ $? -ne 0 ]; then
-            echo "Failed to create service account key file."
-            exit 1
-          fi
-          echo "Service account key file created."
-          
-      - name: Check if service account key file is empty
-        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" | jq -R 'fromjson? | select(. != null)' > $HOME/gcloud-service-key.json || { echo "Failed to create service account key file."; exit 1; }
           if [ ! -s $HOME/gcloud-service-key.json ]; then
             echo "Service account key file is empty."
             exit 1
           fi
-          echo "Service account key file is not empty."
+          echo "Service account key file created."
 
       - name: Check JSON content with line numbers
         run: |
