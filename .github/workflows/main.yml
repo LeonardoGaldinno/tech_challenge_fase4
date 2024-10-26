@@ -13,27 +13,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Google Cloud SDK
+      - name: Create service account key file
         run: |
           echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-service-key.json
+          echo "Service account key file created."
+
+      - name: Check JSON content
+        run: |
+          echo "Contents of gcloud-service-key.json:"
+          cat $HOME/gcloud-service-key.json
           
       - name: Validate JSON format
         run: |
+          echo "Validating JSON format..."
           if ! jq empty $HOME/gcloud-service-key.json; then
             echo "Invalid JSON format."
             exit 1
           fi
-          
+          echo "JSON format is valid."
+
       - name: Authenticate with Google Cloud
-        run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
+        run: |
+          echo "Authenticating with Google Cloud..."
+          gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
 
       - name: Set Google Cloud project
-        run: gcloud config set project neural-journey-377617
+        run: |
+          echo "Setting Google Cloud project..."
+          gcloud config set project neural-journey-377617
 
       - name: Deploy application
         run: |
-          # Your deployment commands here
           echo "Deploying application..."
+          # Add your deployment commands here
 
       - name: Cleanup
-        run: rm $HOME/gcloud-service-key.json
+        run: |
+          echo "Cleaning up..."
+          rm $HOME/gcloud-service-key.json
