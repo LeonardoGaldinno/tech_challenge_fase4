@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy to Google Cloud
 
 on:
   push:
@@ -10,34 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0.2.0
-      with:
-        version: 'latest'
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
+      - name: Set up Google Cloud SDK
+        run: echo "${{ secrets.YOUR_GITHUB_SECRET_NAME }}" > $HOME/gcloud-service-key.json
 
-    - name: Authenticate to Google Cloud
-      run: echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-service-key.json
+      - name: Authenticate with Google Cloud
+        run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
 
-    - name: Check JSON content
-      run: cat $HOME/gcloud-service-key.json
+      - name: Set project
+        run: gcloud config set project neural-journey-377617
 
-    - name: Set GOOGLE_APPLICATION_CREDENTIALS
-      run: echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud-service-key.json" >> $GITHUB_ENV
+      - name: Deploy application
+        run: |
+          # Your deployment commands here, e.g.:
+          # gcloud app deploy app.yaml --quiet
+          echo "Deploying application..."
 
-    - name: Print environment variables
-      run: env
-
-    - name: Configure gcloud
-      run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
-
-    - name: Set Google Cloud Project
-      run: gcloud config set project neural-journey-377617
-
-    - name: Deploy to Google Cloud
-      run: |
-        # Add your deployment commands here
-        echo "Deploying to Google Cloud..."
+      - name: Cleanup
+        run: rm $HOME/gcloud-service-key.json
