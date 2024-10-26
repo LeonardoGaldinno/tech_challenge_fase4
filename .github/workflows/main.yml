@@ -15,7 +15,7 @@ jobs:
 
       - name: Create service account key file
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | sed 's/^/"/;s/$/"/;s/: /": "/g;s/, /", "/g;s/\\n/\\n/g' > $HOME/gcloud-service-key.json
+          echo "${{ secrets.GCP_SA_KEY }}" | jq -R -s 'split("\n") | map(select(length > 0)) | map(sub("^\\s+|\\s+$"; "")) | map(gsub(": \\s*"; ": ")) | map(gsub(",\\s*$"; "")) | map(gsub("^"; "\"")) | map(gsub("$"; "\"")) | join(", ") | "{" + . + "}"' > $HOME/gcloud-service-key.json
           echo "Service account key file created."
 
       - name: Check JSON content with line numbers
