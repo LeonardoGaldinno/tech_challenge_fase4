@@ -15,23 +15,24 @@ jobs:
 
       - name: Set up Google Cloud SDK
         run: |
-          echo "${{ secrets.GCP_SA_KEY }}" | tr -d '\r' > $HOME/gcloud-service-key.json
+          echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-service-key.json
           
-      - name: Display JSON file contents (for debugging)
+      - name: Validate JSON format
         run: |
-          cat $HOME/gcloud-service-key.json
-          echo "End of JSON file contents"
-
+          if ! jq empty $HOME/gcloud-service-key.json; then
+            echo "Invalid JSON format."
+            exit 1
+          fi
+          
       - name: Authenticate with Google Cloud
         run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
 
-      - name: Set project
+      - name: Set Google Cloud project
         run: gcloud config set project neural-journey-377617
 
       - name: Deploy application
         run: |
-          # Your deployment commands here, e.g.:
-          # gcloud app deploy app.yaml --quiet
+          # Your deployment commands here
           echo "Deploying application..."
 
       - name: Cleanup
