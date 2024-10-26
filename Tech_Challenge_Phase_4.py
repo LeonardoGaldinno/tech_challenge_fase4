@@ -20,7 +20,7 @@ if 'GOOGLE_APPLICATION_CREDENTIALS' not in os.environ:
     st.error("A variável de ambiente GOOGLE_APPLICATION_CREDENTIALS não está definida.")
 else:
     # Importação dos dados
-    project_id = 'tc-fiap'
+    project_id = 'neural-journey-377617'
     client = bigquery.Client(project=project_id)
 
     query = """
