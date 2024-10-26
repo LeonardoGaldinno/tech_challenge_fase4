@@ -19,25 +19,10 @@ jobs:
         version: 'latest'
         service_account_key: ${{ secrets.GCP_SA_KEY }}
 
-    - name: Authenticate to Google Cloud
-      run: printf "%s" "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-service-key.json
-
-    - name: Set GOOGLE_APPLICATION_CREDENTIALS
-      run: echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud-service-key.json" >> $GITHUB_ENV
-
-    - name: Configure gcloud
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud-service-key.json
-      run: gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
-
     - name: Set Google Cloud Project
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud-service-key.json
       run: gcloud config set project neural-journey-377617
 
     - name: Deploy to Google Cloud
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud-service-key.json
       run: |
         # Add your deployment commands here
         echo "Deploying to Google Cloud..."
