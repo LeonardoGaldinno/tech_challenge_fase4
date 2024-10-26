@@ -21,6 +21,14 @@ jobs:
             exit 1
           fi
           echo "Service account key file created."
+          
+      - name: Check if service account key file is empty
+        run: |
+          if [ ! -s $HOME/gcloud-service-key.json ]; then
+            echo "Service account key file is empty."
+            exit 1
+          fi
+          echo "Service account key file is not empty."
 
       - name: Check JSON content with line numbers
         run: |
