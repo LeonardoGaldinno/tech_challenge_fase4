@@ -18,11 +18,11 @@ jobs:
           echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-service-key.json
           echo "Service account key file created."
 
-      - name: Check JSON content
+      - name: Check JSON content with line numbers
         run: |
-          echo "Contents of gcloud-service-key.json:"
-          cat $HOME/gcloud-service-key.json
-          
+          echo "Contents of gcloud-service-key.json with line numbers:"
+          nl -ba $HOME/gcloud-service-key.json
+
       - name: Validate JSON format
         run: |
           echo "Validating JSON format..."
