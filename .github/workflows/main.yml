@@ -15,14 +15,15 @@ jobs:
 
     - name: Check if secret is set
       run: |
-        if [ -z "${{ secrets.GCP_SA_KEY_BASE64 }}" ]; then
-          echo "Secret GCP_SA_KEY_BASE64 is not set."
+        echo "GCP_SA_KEY: ${GCP_SA_KEY:-not set}"
+        if [ -z "${{ secrets.GCP_SA_KEY }}" ]; then
+          echo "Secret GCP_SA_KEY is not set."
           exit 1
         fi
 
     - name: Decode service account key
       run: |
-        echo "${{ secrets.GCP_SA_KEY_BASE64 }}" | base64 --decode > $HOME/gcloud-service-key.json
+        echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > $HOME/gcloud-service-key.json
         if [ ! -s $HOME/gcloud-service-key.json ]; then
           echo "Failed to create service account key file."
           exit 1
