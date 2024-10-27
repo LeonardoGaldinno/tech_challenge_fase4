@@ -33,7 +33,8 @@ try:
         "token_uri": st.secrets["token_uri"],
         "auth_provider_x509_cert_url": st.secrets["auth_provider_x509_cert_url"],
         "client_x509_cert_url": st.secrets["client_x509_cert_url"],
-
+    }
+    
     # Cria o BigQuery client utilizando as credenciais
     client = bigquery.Client.from_service_account_info(credentials)
     
@@ -42,46 +43,45 @@ try:
     SELECT * FROM `neural-journey-377617.cars.cars_table` LIMIT 1000
     """
     ipea_df = client.query(query).to_dataframe()
-    }
     
     except Exception as e:
     st.error(f"An error occurred: {e}")
 
-    # Dados de Exemplo
-    st.header("Demonstração dos Dados (tabelas)")
-    st.write(ipea_df.head())
+# Dados de Exemplo
+st.header("Demonstração dos Dados (tabelas)")
+st.write(ipea_df.head())
 
-    # Exploração de Dados
-    st.header("Análise Exploratória de Dados")
-    st.write("Aqui exploraremos os dados para encontrar padrões e insights interessantes.")
+# Exploração de Dados
+st.header("Análise Exploratória de Dados")
+st.write("Aqui exploraremos os dados para encontrar padrões e insights interessantes.")
 
-    # Exibir estatísticas básicas
-    st.subheader("Estatísticas + Insights")
-    st.write("""
-    Com base na exploração dos dados, podemos concluir o seguinte:
-    - Insights relevantes sobre a variação do preço do petróleo
-    - Situações geopolíticas
-    - Crises econômicas
-    - Demanda global por energia e Outros fatores relevantes.
-    - É obrigatório trazer pelo menos 4 insights neste desafio.""")
+# Exibir estatísticas básicas
+st.subheader("Estatísticas + Insights")
+st.write("""
+Com base na exploração dos dados, podemos concluir o seguinte:
+- Insights relevantes sobre a variação do preço do petróleo
+- Situações geopolíticas
+- Crises econômicas
+- Demanda global por energia e Outros fatores relevantes.
+- É obrigatório trazer pelo menos 4 insights neste desafio.""")
 
-    # Exibir um gráfico
-    st.subheader("Visualização de Dados + insights")
+# Exibir um gráfico
+st.subheader("Visualização de Dados + insights")
     
-    # Modelo Machine Learning
-    st.header("Modelo Machine Learning")
-    st.write("""
-    Com base na exploração dos dados, podemos concluir o seguinte:
-    - Modelo de Machine Learning que faça a previsão do preço do petróleo diariamente
-    - O modelo deve estar contemplado no storytelling.
-    - Incluir o código utilizado e análise das performances do modelo.
-    - Criar um plano para deploy em produção do modelo, com as ferramentas necessárias.
-    - Fazer um MVP do modelo em produção utilizando o Streamlit.""")
+# Modelo Machine Learning
+st.header("Modelo Machine Learning")
+st.write("""
+Com base na exploração dos dados, podemos concluir o seguinte:
+- Modelo de Machine Learning que faça a previsão do preço do petróleo diariamente
+- O modelo deve estar contemplado no storytelling.
+- Incluir o código utilizado e análise das performances do modelo.
+- Criar um plano para deploy em produção do modelo, com as ferramentas necessárias.
+- Fazer um MVP do modelo em produção utilizando o Streamlit.""")
 
-    # Conclusões
-    st.header("Conclusão")
-    st.write("""
-    Com base na exploração dos dados, podemos concluir o seguinte:
-    - Insight 1
-    - Insight 2
-    - Insight 3""")
+# Conclusões
+st.header("Conclusão")
+st.write("""
+Com base na exploração dos dados, podemos concluir o seguinte:
+- Insight 1
+- Insight 2
+- Insight 3""")
