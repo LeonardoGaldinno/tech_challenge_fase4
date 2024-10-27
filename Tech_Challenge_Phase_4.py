@@ -44,7 +44,7 @@ try:
     """
     ipea_df = client.query(query).to_dataframe()
     
-    except Exception as e:
+except Exception as e:
     st.error(f"An error occurred: {e}")
 
 # Dados de Exemplo
@@ -63,11 +63,12 @@ Com base na exploração dos dados, podemos concluir o seguinte:
 - Situações geopolíticas
 - Crises econômicas
 - Demanda global por energia e Outros fatores relevantes.
-- É obrigatório trazer pelo menos 4 insights neste desafio.""")
+- É obrigatório trazer pelo menos 4 insights neste desafio.
+""")
 
 # Exibir um gráfico
 st.subheader("Visualização de Dados + insights")
-    
+
 # Modelo Machine Learning
 st.header("Modelo Machine Learning")
 st.write("""
@@ -76,7 +77,8 @@ Com base na exploração dos dados, podemos concluir o seguinte:
 - O modelo deve estar contemplado no storytelling.
 - Incluir o código utilizado e análise das performances do modelo.
 - Criar um plano para deploy em produção do modelo, com as ferramentas necessárias.
-- Fazer um MVP do modelo em produção utilizando o Streamlit.""")
+- Fazer um MVP do modelo em produção utilizando o Streamlit.
+""")
 
 # Conclusões
 st.header("Conclusão")
@@ -84,4 +86,5 @@ st.write("""
 Com base na exploração dos dados, podemos concluir o seguinte:
 - Insight 1
 - Insight 2
-- Insight 3""")
+- Insight 3
+""")
