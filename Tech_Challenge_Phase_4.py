@@ -1,4 +1,4 @@
-import os
+import json
 from google.cloud import bigquery
 import streamlit as st
 
@@ -23,8 +23,8 @@ try:
     project_id = st.secrets["project_id"]
     private_key = st.secrets["private_key"].replace("\\n", "\n")  # Handle newline characters correctly
     client_email = st.secrets["client_email"]
-
-    # Set up the credentials using the private key
+    
+    # Prepare the credentials dictionary
     credentials = {
         "type": "service_account",
         "project_id": project_id,
@@ -38,10 +38,7 @@ try:
         "client_x509_cert_url": st.secrets["client_x509_cert_url"],
     }
 
-    # Set the environment variable for Google credentials
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials
-
-    # Importação dos dados
+    # Create the BigQuery client from the credentials
     client = bigquery.Client.from_service_account_info(credentials)
 
     query = """
