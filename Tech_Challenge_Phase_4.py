@@ -2,19 +2,6 @@ import json
 from google.cloud import bigquery
 import streamlit as st
 
-# Introdução
-st.title("Tech Challenge Phase 4")
-st.header("Introdução")
-st.write("""
-Bem-vindo a este projeto. Neste projeto, exploraremos os dados, descobriremos insights e tiraremos conclusões.
-""")
-
-# Organização dos dados
-st.header("Organização do Banco de Dados")
-st.write("""
-Estrutura dos dados no Big Query
-""")
-
 try:
     # Carrega secrets do Streamlit
     project_id = st.secrets["project_id"]
@@ -47,44 +34,75 @@ try:
 except Exception as e:
     st.error(f"An error occurred: {e}")
 
-# Dados de Exemplo
-st.header("Demonstração dos Dados (tabelas)")
-st.write(ipea_df.head())
+# Create tabs
+tabs = st.tabs(["Introdução", "Relatório", "Dashboard", "Modelo Machine Learning"])
 
-# Exploração de Dados
-st.header("Análise Exploratória de Dados")
-st.write("Aqui exploraremos os dados para encontrar padrões e insights interessantes.")
+# Tab: Introdução
+with tabs[0]:
+    st.header("Introdução")
+    st.write("""
+    Bem-vindo a este projeto. Neste projeto, exploraremos os dados, descobriremos insights e tiraremos conclusões.
+    """)
 
-# Exibir estatísticas básicas
-st.subheader("Estatísticas + Insights")
-st.write("""
-Com base na exploração dos dados, podemos concluir o seguinte:
-- Insights relevantes sobre a variação do preço do petróleo
-- Situações geopolíticas
-- Crises econômicas
-- Demanda global por energia e Outros fatores relevantes.
-- É obrigatório trazer pelo menos 4 insights neste desafio.
-""")
 
-# Exibir um gráfico
-st.subheader("Visualização de Dados + insights")
+with tabs[1]:
+    # Organização dos dados
+    st.header("Organização do Banco de Dados")
+    st.write("""
+    Estrutura dos dados no Big Query
+    """)
+  
+    # Dados de Exemplo
+    st.header("Demonstração dos Dados (tabelas)")
+    #st.write(ipea_df.head())
 
-# Modelo Machine Learning
-st.header("Modelo Machine Learning")
-st.write("""
-Com base na exploração dos dados, podemos concluir o seguinte:
-- Modelo de Machine Learning que faça a previsão do preço do petróleo diariamente
-- O modelo deve estar contemplado no storytelling.
-- Incluir o código utilizado e análise das performances do modelo.
-- Criar um plano para deploy em produção do modelo, com as ferramentas necessárias.
-- Fazer um MVP do modelo em produção utilizando o Streamlit.
-""")
+    # Exploração de Dados
+    st.header("Análise Exploratória de Dados")
+    st.write("Aqui exploraremos os dados para encontrar padrões e insights interessantes.")
 
-# Conclusões
-st.header("Conclusão")
-st.write("""
-Com base na exploração dos dados, podemos concluir o seguinte:
-- Insight 1
-- Insight 2
-- Insight 3
-""")
+    # Exibir estatísticas básicas
+    st.subheader("Estatísticas + Insights")
+    st.write("""
+    Com base na exploração dos dados, podemos concluir o seguinte:
+    - Insights relevantes sobre a variação do preço do petróleo
+    - Situações geopolíticas
+    - Crises econômicas
+    - Demanda global por energia e Outros fatores relevantes.
+    - É obrigatório trazer pelo menos 4 insights neste desafio.
+    """)
+
+    # Exibir um gráfico
+    st.subheader("Visualização de Dados + insights")
+
+    # Modelo Machine Learning
+    st.header("Modelo Machine Learning")
+    st.write("""
+    Com base na exploração dos dados, podemos concluir o seguinte:
+    - Modelo de Machine Learning que faça a previsão do preço do petróleo diariamente
+    - O modelo deve estar contemplado no storytelling.
+    - Incluir o código utilizado e análise das performances do modelo.
+    - Criar um plano para deploy em produção do modelo, com as ferramentas necessárias.
+    - Fazer um MVP do modelo em produção utilizando o Streamlit.
+    """)
+
+    # Conclusões
+    st.header("Conclusão")
+    st.write("""
+    Com base na exploração dos dados, podemos concluir o seguinte:
+    - Insight 1
+    - Insight 2
+    - Insight 3
+    - Insight 4
+    """)
+
+with tabs[2]:
+    st.header("Dashboard")
+    st.write("""
+    Aqui será apresentado o dashboard com os dados e insights encontrados.
+    """)
+
+with tabs[3]:
+    st.header("Modelo Machine Learning")
+    st.write("""
+    Aqui será apresentado o modelo de Machine Learning.
+    """)
