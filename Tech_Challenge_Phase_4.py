@@ -28,28 +28,21 @@ try:
     # Cria o BigQuery client utilizando as credenciais
     client = bigquery.Client.from_service_account_info(credentials)
     
-    # Query dos dados
+    # Query the data
     query = """
-    SELECT * FROM `neural-journey-377617.cars.cars_table` LIMIT 1000
+    SELECT * FROM `tc-fiap.fase_4.ipea_tratada_final` 
+    WHERE Data > DATE_SUB(CURRENT_DATE(), INTERVAL 5 YEAR)
     """
-    ipea_df = client.query(query).to_dataframe()
-    
+
+    query2 = """
+    SELECT * FROM `tc-fiap.fase_4.consumo_mundial_petroleo`
+    WHERE Data > DATE_SUB(CURRENT_DATE(), INTERVAL 5 YEAR)
+    """   
 except Exception as e:
     st.error(f"An error occurred: {e}")
 
 # Create a BigQuery client using the service account key file
 client = bigquery.Client.from_service_account_json(key_path)
-
-# Query the data
-query = """
-SELECT * FROM `tc-fiap.fase_4.ipea_tratada_final` 
-WHERE Data > DATE_SUB(CURRENT_DATE(), INTERVAL 5 YEAR)
-"""
-
-query2 = """
-SELECT * FROM `tc-fiap.fase_4.consumo_mundial_petroleo`
-WHERE Data > DATE_SUB(CURRENT_DATE(), INTERVAL 5 YEAR)
-"""
 
 ipea_df = client.query(query).to_dataframe()
 ipea_df = ipea_df.rename(columns={'Preco': 'preco_bpd_US', 'Data': 'data'})
