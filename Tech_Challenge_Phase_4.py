@@ -41,17 +41,12 @@ try:
 except Exception as e:
     st.error(f"An error occurred: {e}")
 
-# Create a BigQuery client using the service account key file
-client = bigquery.Client.from_service_account_json(key_path)
-
 ipea_df = client.query(query).to_dataframe()
 ipea_df = ipea_df.rename(columns={'Preco': 'preco_bpd_US', 'Data': 'data'})
 ipea_df['data'] = pd.to_datetime(ipea_df['data'])
 ipea_df = ipea_df.set_index('data').asfreq('D')
 ipea_df = ipea_df.fillna(method='bfill')
 ipea_df = ipea_df[ipea_df.index <= pd.to_datetime('today')]
-
-
 consumo_mundial_df = client.query(query2).to_dataframe()
 
 # Create tabs
