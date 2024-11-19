@@ -178,72 +178,56 @@ with tabs[1]:
 
 # Tab: Dashboard
 with tabs[2]:
-    st.header("Dashboard")
-    st.write("Aqui será apresentado o dashboard com os dados e insights encontrados.")
+    with st.container():
+        col_dash, col_filters = st.columns([5, 1])
+        with col_filters:
+            st.subheader("Filtros Interativos")
+            min_date = ipea_df.index.min()
+            max_date = ipea_df.index.max()
+            start_date = st.date_input("Data de Início", value=min_date, min_value=min_date, max_value=max_date)
+            end_date = st.date_input("Data de Fim", value=max_date, min_value=min_date, max_value=max_date)
 
-    min_date = ipea_df.index.min()
-    max_date = ipea_df.index.max()
+            start_date = pd.to_datetime(start_date)
+            end_date = pd.to_datetime(end_date)
 
-    st.subheader("Filtros Interativos")
-    start_date = st.date_input("Data de Início", value=min_date, min_value=min_date, max_value=max_date)
-    end_date = st.date_input("Data de Fim", value=max_date, min_value=min_date, max_value=max_date)
+            filtered_data = ipea_df[(ipea_df.index >= start_date) & (ipea_df.index <= end_date)]
 
-    start_date = pd.to_datetime(start_date)
-    end_date = pd.to_datetime(end_date)
+        with col_dash:
+            st.header("Dashboard")
+            col1, col2 = st.columns(2)
 
-    filtered_data = ipea_df[(ipea_df.index >= start_date) & (ipea_df.index <= end_date)]
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("Preço Médio Anual")
-        annual_data = filtered_data.resample('A').mean().reset_index()
-        annual_chart = alt.Chart(annual_data).mark_line().encode(
-            x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y', tickCount='year')),
-            y=alt.Y('preco_bpd_US', title='Preço Médio Anual (USD)')
-        ).properties(
-            width=300,
-            height=200
-        )
-        st.altair_chart(annual_chart, use_container_width=True)
-
-    with col2:
-        st.subheader("Volatilidade Anual")
-        annual_volatility_data = filtered_data['preco_bpd_US'].resample('A').std().reset_index()
-        annual_volatility_chart = alt.Chart(annual_volatility_data).mark_line().encode(
-            x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y', tickCount='year')),
-            y=alt.Y('preco_bpd_US', title='Desvio Padrão Anual (USD)')
-            ).properties(
-                width=300,
-                height=200
-                )   
-        st.altair_chart(annual_volatility_chart, use_container_width=True)
-
-    col3, col4 = st.columns(2)
-
-    with col3:
-        st.subheader("Preço Médio Mensal")
-        monthly_avg_data = filtered_data.resample('M').mean().reset_index()
-        monthly_avg_chart = alt.Chart(monthly_avg_data).mark_line().encode(
-            x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-            y=alt.Y('preco_bpd_US', title='Preço Médio Mensal (USD)')
-            ).properties(
-                width=300,
-                height=200
+            with col1: 
+                st.subheader("Variação Anual dos Preços do Petróleo")
+                annual_prices = filtered_data.resample('Y').mean().reset_index()
+                bar_chart = alt.Chart(annual_prices).mark_bar().encode(
+                    x=alt.X('year(data):T', title='Ano', axis=alt.Axis(labelAngle=0), bandPosition=0),
+                    y=alt.Y('preco_bpd_US', title='Preço Médio por Litro (USD)')
+                ).properties(
+                    width=400,
+                    height=300
                 )
-        st.altair_chart(monthly_avg_chart, use_container_width=True)
 
-    with col4:
-        st.subheader("Volatilidade Mensal")
-        monthly_volatility_data = filtered_data['preco_bpd_US'].resample('M').std().reset_index()
-        monthly_volatility_chart = alt.Chart(monthly_volatility_data).mark_line().encode(
-            x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-            y=alt.Y('preco_bpd_US', title='Desvio Padrão Mensal (USD)')
-        ).properties(
-            width=300,
-            height=200
-        )
-        st.altair_chart(monthly_volatility_chart, use_container_width=True)
+                st.altair_chart(bar_chart, use_container_width=True)
+
+            with col2:
+                st.subheader("Volatilidade Mensal")
+                monthly_volatility_data = filtered_data['preco_bpd_US'].resample('M').std().reset_index()
+                monthly_volatility_chart = alt.Chart(monthly_volatility_data).mark_line().encode(
+                    x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
+                    y=alt.Y('preco_bpd_US', title='Volatilidade Mensal (USD)')
+                ).properties(
+                    width=400,
+                    height=300
+                )
+                st.altair_chart(monthly_volatility_chart, use_container_width=True)
+
+            col3, col4 = st.columns(2)
+
+            #with col3:
+                #Adicione um grafico
+
+            #with col4:
+                #Adicione um grafico
 
 # Tab: Modelo Machine Learning
 with tabs[3]:
