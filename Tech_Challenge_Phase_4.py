@@ -51,6 +51,7 @@ ipea_df = ipea_df.set_index('data').asfreq('D')
 ipea_df = ipea_df.fillna(method='bfill')
 ipea_df = ipea_df[ipea_df.index <= pd.to_datetime('today')]
 consumo_mundial_df = client.query(query2).to_dataframe()
+merged_df = pd.merge(ipea_df, consumo_mundial_df, on='data', how='inner')
 
 # Create tabs
 tabs = st.tabs(["Introdução", "Relatório", "Dashboard", "Modelo Machine Learning"])
