@@ -51,6 +51,9 @@ ipea_df = ipea_df.set_index('data').asfreq('D')
 ipea_df = ipea_df.fillna(method='bfill')
 ipea_df = ipea_df[ipea_df.index <= pd.to_datetime('today')]
 consumo_mundial_df = client.query(query2).to_dataframe()
+consumo_mundial_df = consumo_mundial_df.rename(columns={'Data': 'data'})
+consumo_mundial_df['data'] = pd.to_datetime(consumo_mundial_df['data'])
+consumo_mundial_df['Preco_Por_Barril'] = consumo_mundial_df['Preco_Por_Barril'].abs()
 merged_df = pd.merge(ipea_df, consumo_mundial_df, on='data', how='inner')
 
 # Create tabs
