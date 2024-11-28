@@ -50,11 +50,23 @@ ipea_df['data'] = pd.to_datetime(ipea_df['data'])
 ipea_df = ipea_df.set_index('data').asfreq('D')
 ipea_df = ipea_df.fillna(method='bfill')
 ipea_df = ipea_df[ipea_df.index <= pd.to_datetime('today')]
-consumo_mundial_df = client.query(query2).to_dataframe()
-consumo_mundial_df = consumo_mundial_df.rename(columns={'Data': 'data'})
-consumo_mundial_df['data'] = pd.to_datetime(consumo_mundial_df['data'])
-consumo_mundial_df['Preco_Por_Barril'] = consumo_mundial_df['Preco_Por_Barril'].abs()
-merged_df = pd.merge(ipea_df, consumo_mundial_df, on='data', how='inner')
+ipea_df['year'] = ipea_df.index.year
+ipea_avg_per_year = ipea_df.groupby('year')['preco_bpd_US'].mean().reset_index()
+
+consumo_mundial_df = pd.DataFrame({
+    "year": [2024, 2023, 2022, 2021, 2020, 2019],
+    "Consumo": [102.0, 100.0, 99.0, 96.0, 91.0, 100.5],
+    "Fontes": [
+        "EIA (Energy Information Administration)",
+        "EIA (Energy Information Administration)",
+        "IEA (International Energy Agency)",
+        "IEA (International Energy Agency)",
+        "OPEC (Organization of the Petroleum Exporting Countries)",
+        "EIA (Energy Information Administration)"
+    ]
+})
+
+merged_df = pd.merge(ipea_avg_per_year, consumo_mundial_df, on='year', how='left')
 
 # Create tabs
 tabs = st.tabs(["Introdução", "Relatório", "Dashboard", "Modelo Machine Learning"])
@@ -99,14 +111,18 @@ with tabs[1]:
         with col2:
             st.header("Base de Dados")
             st.write("""
-            Para este projeto, utilizamos dados históricos de preços do petróleo, que são fornecidos pelo site do IPEA. 
-            Esses dados incluem informações sobre as datas e os preços do petróleo ao longo do tempo. Para garantir que esses dados sejam bem organizados 
-            e facilmente acessíveis, armazenamos tudo no BigQuery, uma plataforma de armazenamento de dados na nuvem. Isso não só facilita a 
-            estruturação dos dados, mas também permite que eles sejam integrados automaticamente com o Streamlit, a ferramenta que usamos para 
-            criar nosso dashboard interativo e o modelo de previsão. Dessa forma, conseguimos atualizar e visualizar os dados em tempo real, 
-            proporcionando uma experiência mais eficiente e dinâmica para os usuários.
+            Para este projeto, utilizamos dados históricos de preços do petróleo brent, que são fornecidos pelo site do Instituto de Pesquisa 
+            Econômica Aplicada (IPEA), como também dados de consumo mundial de petróleo de fontes como: Energy Information Administration (EIA), 
+            International Energy Agency (IEA) e Organization of the Petroleum Exporting Countries (OPEC).
+     
+            Esses dados incluem informações sobre as datas, os preços e a média diária do consumo de petróleo ao longo do tempo. 
+            Para garantir que os dados estejam bem organizados e facilmente acessíveis, armazenamos tudo no BigQuery, uma plataforma de 
+            armazenamento de dados na nuvem. Isso não só facilita a estruturação dos dados, mas também permite que eles sejam integrados 
+            automaticamente com o Streamlit, a ferramenta que usamos para criar nosso dashboard interativo e o modelo de previsão. 
+            Dessa forma, conseguimos atualizar e visualizar os dados em tempo real, proporcionando uma experiência mais eficiente e dinâmica 
+            para os usuários.
             """)
-
+            
             st.header("Análise Exploratória de Dados")
             ipea_df = ipea_df.dropna(subset=['preco_bpd_US'])
             decomposition = seasonal_decompose(ipea_df['preco_bpd_US'], model='additive', period=12)
@@ -119,7 +135,7 @@ with tabs[1]:
 
             trend_chart = alt.Chart(decomposition_data).mark_line(color='blue').encode(
                 x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-                y=alt.Y('trend', title='')
+                y=alt.Y('trend', title='Preço do Petróleo (USD)')
             ).properties(width=500, height=300)
 
             seasonal_chart = alt.Chart(decomposition_data).mark_line(color='blue').encode(
@@ -148,7 +164,7 @@ with tabs[1]:
             st.subheader("Sazonalidade")
             st.altair_chart(seasonal_chart, use_container_width=True)
 
-            st.write("""**Análise de Sazonalidade:** No gráfico acima poodemos observar variações sazonais que podem estar associadas a eventos econômicos recorrentes. 
+            st.write("""**Análise de Sazonalidade:** No gráfico acima podemos observar variações sazonais que podem estar associadas a eventos econômicos recorrentes. 
             É importante entender as flutuações periódicas nos preços e para fazer previsões mais precisas. 
             A sazonalidade pode ser causada por fatores como mudanças climáticas, feriados, eventos sazonais ou flutuações na demanda.
             """)
@@ -168,7 +184,7 @@ with tabs[1]:
 
             filtered_data = ipea_df[(ipea_df.index.year > start_year) & (ipea_df.index.year <= current_year)]
 
-            annual_prices = filtered_data.resample('Y').mean().reset_index()
+            annual_prices = filtered_data.resample('YE').mean().reset_index()
             bar_chart = alt.Chart(annual_prices).mark_bar().encode(
                 x=alt.X('year(data):T', title='Ano', axis=alt.Axis(labelAngle=0), bandPosition=0),
                 y=alt.Y('preco_bpd_US', title='Preço Médio por Litro (USD)')
@@ -190,7 +206,7 @@ with tabs[1]:
             """)
 
             st.subheader("Volatilidade Mensal do Preço do Petróleo ao Longo de 5 anos")
-            monthly_volatility = ipea_df['preco_bpd_US'].resample('M').std().reset_index()
+            monthly_volatility = ipea_df['preco_bpd_US'].resample('ME').std().reset_index()
             volatility_line_chart = alt.Chart(monthly_volatility).mark_line().encode(
                 x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
                 y=alt.Y('preco_bpd_US', title='Desvio Padrão Mensal (USD)')
@@ -207,6 +223,8 @@ with tabs[1]:
             Por outro lado, períodos de baixa volatilidade podem ser mais atraentes para investidores que buscam estabilidade e menor risco em seus portfólios. 
             Compreender esses padrões ajuda os investidores a tomar decisões mais informadas sobre quando entrar ou sair do mercado.
             """)
+
+            st.subheader("Análise de Key Performance Indicators (KPIs)")
 
             st.write("""A taxa de juros dos Estados Unidos da América (EUA) e o preço do dólar são dois fatores importantes que influenciam os preços do petróleo.
             Os gráficos abaixo mostram a cotização do dólar e a taxa de juros dos EUA. 
@@ -229,6 +247,31 @@ with tabs[1]:
 
             st.write("""- **Preço do Dólar:** O preço do dólar influencia diretamente o preço do petróleo, pois o barril de petróleo é cotado em dólar. 
             Flutuações no valor do dólar podem impactar significativamente os preços do petróleo.""")
+
+            st.subheader("Análise da média diaria de consumo de petróleo por ano vs preço médio") 
+
+            consumption_chart = alt.Chart(merged_df).mark_area(opacity=0.4, color='blue').encode(
+                x=alt.X('year:O', title='Ano', axis=alt.Axis(labelAngle=0)),
+                y=alt.Y('Consumo', title='Consumo (média Mi. barris p/ dia)', axis=alt.Axis(titleColor='blue'),
+                    scale=alt.Scale(domain=[0, merged_df['Consumo'].max()])),
+                    ).properties(width=500, height=302)
+
+            price_chart = alt.Chart(merged_df).mark_area(opacity=0.4, color='darkred').encode(
+                x=alt.X('year:O', title='Ano', axis=alt.Axis(labelAngle=0)),
+                y=alt.Y('preco_bpd_US', title='Preço Médio do Petróleo (USD)', axis=alt.Axis(titleColor='darkred'),
+                    scale=alt.Scale(domain=[0, merged_df['preco_bpd_US'].max()])),
+                    ).properties(width=500, height=302)
+
+            combined_chart = alt.layer(consumption_chart, price_chart).resolve_scale(
+                y='independent')
+
+            st.markdown("<h4 style='font-size: 22px;'>Consumo Mundial de Petróleo vs. Preço Médio</h4>", unsafe_allow_html=True)
+            st.altair_chart(combined_chart, use_container_width=True)
+
+            st.write("""**Análise de Consumo Mundial vs. Preço Médio:** 
+            O gráfico acima compara a média diária por ano de consumo de petróleo com o preço médio do petróleo ao longo dos anos.
+            Podemos observar que apesar das variações no preço do petróleo, o consumo mundial tem se mantido relativamente estável.
+            Isso sugere que o consumo de petróleo é influenciado por fatores diferentes dos preços, como a demanda global por energia e a produção de petróleo.""")
 
             st.write("""Todos os gráficos apresentados acima permitem uma análise detalhada dos dados, incluindo componentes de tendência, sazonalidade e ruído, entre outros.
             Essa análise é fundamental para entender os padrões subjacentes e identificar possíveis tendências e anomalias que podem afetar os resultados no futuro.
@@ -270,7 +313,7 @@ with tabs[2]:
 
             
             filtered_data = ipea_df[(ipea_df.index >= start_date) & (ipea_df.index <= end_date)]
-            filtered_merged_df = merged_df[(merged_df['data'] >= start_date) & (merged_df['data'] <= end_date)]
+            filtered_merged_df = merged_df[(merged_df['year'] >= start_date.year) & (merged_df['year'] <= end_date.year)]
 
             
             min_price = float(filtered_data['preco_bpd_US'].min())
@@ -285,42 +328,24 @@ with tabs[2]:
 
             
             filtered_data = filtered_data[(filtered_data['preco_bpd_US'] >= price_range[0]) & (filtered_data['preco_bpd_US'] <= price_range[1])]
-            filtered_merged_df = filtered_merged_df[(filtered_merged_df['preco_bpd_US'] >= price_range[0]) & (filtered_merged_df['preco_bpd_US'] <= price_range[1])]
-
-            
-            if filtered_data.empty:
-                st.warning("Nenhum dado disponível para o intervalo de preço selecionado. Ajustando o intervalo de datas automaticamente.")
-                available_dates = filtered_data.index
-                start_date = available_dates.min() if not available_dates.empty else min_date
-                end_date = available_dates.max() if not available_dates.empty else max_date
-                filtered_data = ipea_df[(ipea_df.index >= start_date) & (ipea_df.index <= end_date)]
-                filtered_merged_df = merged_df[(merged_df['data'] >= start_date) & (merged_df['data'] <= end_date)]
-
+            #filtered_merged_df = filtered_merged_df[(filtered_merged_df['preco_bpd_US'] >= price_range[0]) & (filtered_merged_df['preco_bpd_US'] <= price_range[1])]
             
             years = filtered_data.index.year.unique()
             selected_years = st.multiselect("Selecione o Ano", options=years, default=years.tolist())
             filtered_data = filtered_data[filtered_data.index.year.isin(selected_years)]
-            filtered_merged_df = filtered_merged_df[filtered_merged_df['data'].dt.year.isin(selected_years)]
-
+            filtered_merged_df = filtered_merged_df[filtered_merged_df['year'].isin(selected_years)]
             
             months = filtered_data.index.month.unique()
             selected_months = st.multiselect("Selecione o Mês", options=months, default=months.tolist())
             filtered_data = filtered_data[filtered_data.index.month.isin(selected_months)]
-            filtered_merged_df = filtered_merged_df[filtered_merged_df['data'].dt.month.isin(selected_months)]
+            #filtered_merged_df = filtered_merged_df[filtered_merged_df['data'].dt.month.isin(selected_months)]
 
-            
-            volatility_window = st.slider("Janela para Média Móvel de Volatilidade (em meses)", min_value=1, max_value=12, value=6)
-            
-            
-            monthly_volatility_data = filtered_data['preco_bpd_US'].resample('M').std().reset_index()
-
-            
+            volatility_window = st.slider("Janela para Média Móvel de Volatilidade (em meses)", min_value=1, max_value=12, value=1)
+            monthly_volatility_data = filtered_data['preco_bpd_US'].resample('ME').std().reset_index()
             monthly_volatility_data['volatility_moving_avg'] = monthly_volatility_data['preco_bpd_US'].rolling(window=volatility_window).mean()
 
-            
             st.write(f"Janela para Média Móvel de Volatilidade: {volatility_window} meses")
 
-            
             st.subheader("Filtros Aplicados:")
             st.markdown(f"**Data de Início:** {start_date.strftime('%d/%m/%Y')}")
             st.markdown(f"**Data de Fim:** {end_date.strftime('%d/%m/%Y')}")
@@ -332,7 +357,6 @@ with tabs[2]:
         with col_dash:
             st.header("Dashboard")
             
-            
             col1, col2, col3 = st.columns(3)
 
             with col1:
@@ -343,89 +367,100 @@ with tabs[2]:
                 
             with col3:
                 st.metric(label="Indice Dólar Americano", value="101.789", delta="15%")
-
             
+
             col4, col5 = st.columns(2)
-            
+
             with col4:
-                st.subheader("Variação Anual dos Preços do Petróleo")
-                
-                annual_prices = filtered_data.resample('Y').mean().reset_index()
+                st.subheader("Variação Anual da Media dos Preços do Petróleo")
+                try:
+                    annual_prices = filtered_data.resample('YE').mean().reset_index()
+                    years_in_data = annual_prices['data'].dt.year.unique()
 
-                years_in_data = annual_prices['data'].dt.year.unique()
-               
-                bar_chart = alt.Chart(annual_prices).mark_bar(color='steelblue').encode(
-                    x=alt.X('year(data):T', title='Ano', axis=alt.Axis(labelAngle=0), 
-                        scale=alt.Scale(domain=list(years_in_data))),
-                    y=alt.Y('preco_bpd_US', title='Preço Médio por Litro (USD)')
-                ).properties(width=500, height=303)
+                    bar_chart = alt.Chart(annual_prices).mark_bar(color='steelblue').encode(
+                        x=alt.X('year(data):O',  # Change to 'O' for ordinal (categorical) encoding
+                                title='Ano',
+                                axis=alt.Axis(
+                                    labelAngle=0, 
+                                    labelAlign='center',  # Center the labels horizontally
+                                    labelOffset=10  # Optional: Adjust if labels are too close/far from bars
+                                ),
+                                scale=alt.Scale(domain=list(years_in_data))),  # Use the exact years
+                        y=alt.Y('preco_bpd_US', title='Preço Médio por Litro (USD)'),
+                    ).properties(width=500, height=303)
 
-                st.altair_chart(bar_chart, use_container_width=True)
+                    st.altair_chart(bar_chart, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Erro ao gerar o gráfico de Variação Anual dos Preços do Petróleo: {e}")
 
             with col4:
                 st.subheader("Volatilidade Mensal (com Média Móvel)")
-                volatility_chart = alt.Chart(monthly_volatility_data).mark_line(color='cornflowerblue').encode(
-                    x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-                    y=alt.Y('volatility_moving_avg', title='Volatilidade Mensal com Média Móvel (USD)')
-                ).properties(width=500, height=302)
-                st.altair_chart(volatility_chart, use_container_width=True)
+                try:
+                    volatility_chart = alt.Chart(monthly_volatility_data).mark_line(color='cornflowerblue').encode(
+                        x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
+                        y=alt.Y('volatility_moving_avg', title='Volatilidade Mensal com Média Móvel (USD)')
+                    ).properties(width=500, height=302)
+                    st.altair_chart(volatility_chart, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Erro ao gerar o gráfico de Volatilidade Mensal: {e}")
             
             with col4:
-                st.subheader("Preco Por Barril vs Consumo Mundial")
+                try:
+                    consumption_chart = alt.Chart(filtered_merged_df).mark_area(opacity=0.4, color='blue').encode(
+                        x=alt.X('year:O', title='Ano', axis=alt.Axis(labelAngle=0)),
+                        y=alt.Y('Consumo', title='Consumo (média Mi. barris p/ dia)', axis=alt.Axis(titleColor='blue'),
+                                scale=alt.Scale(domain=[0, filtered_merged_df['Consumo'].max()])),
+                    ).properties(width=500, height=302)
 
-                
-                chart1 = alt.Chart(filtered_merged_df).mark_area(opacity=0.4, color='blue').encode(
-                    x=alt.X('data', title='Index', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-                    y=alt.Y('Preco_Por_Barril', title='Consumo (Média Mi. Barris p/ dia)', axis=alt.Axis(titleColor='blue'))
-                )
+                    price_chart = alt.Chart(filtered_merged_df).mark_area(opacity=0.4, color='darkred').encode(
+                        x=alt.X('year:O', title='Ano', axis=alt.Axis(labelAngle=0)),
+                        y=alt.Y('preco_bpd_US', title='Preço Médio do Petróleo (USD)', axis=alt.Axis(titleColor='darkred'),
+                                scale=alt.Scale(domain=[0, filtered_merged_df['preco_bpd_US'].max()])),
+                    ).properties(width=500, height=302)
 
-                
-                chart2 = alt.Chart(filtered_merged_df).mark_area(opacity=0.4, color='darkred').encode(
-                    x=alt.X('data', title='Index', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-                    y=alt.Y('preco_bpd_US', title='Preço BPD US', axis=alt.Axis(titleColor='darkred'))
-                ).properties(
-                    width=500,
-                    height=301
-                )
+                    combined_chart = alt.layer(consumption_chart, price_chart).resolve_scale(
+                        y='independent'
+                    )
 
-                area_chart = alt.layer(chart1, chart2).resolve_scale(
-                    y='independent'
-                )
-
-                st.altair_chart(area_chart, use_container_width=True)
+                    st.markdown("<h4 style='font-size: 22px;'>Consumo Mundial de Petróleo vs. Preço Médio</h4>", unsafe_allow_html=True)
+                    st.altair_chart(combined_chart, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Erro ao gerar o gráfico de Consumo Mundial e Preço Médio: {e}")
 
             with col5:
-                filtered_data = filtered_data.dropna(subset=['preco_bpd_US'])
-                decomposition = seasonal_decompose(filtered_data['preco_bpd_US'], model='additive', period=12)
-                decomposition_data = pd.DataFrame({
-                    'data': filtered_data.index,
-                    'trend': decomposition.trend,
-                    'seasonal': decomposition.seasonal,
-                    'residual': decomposition.resid
-                }).dropna()
+                try:
+                    filtered_data = filtered_data.dropna(subset=['preco_bpd_US'])
+                    decomposition = seasonal_decompose(filtered_data['preco_bpd_US'], model='additive', period=12)
+                    decomposition_data = pd.DataFrame({
+                        'data': filtered_data.index,
+                        'trend': decomposition.trend,
+                        'seasonal': decomposition.seasonal,
+                        'residual': decomposition.resid
+                    }).dropna()
 
-                trend_chart = alt.Chart(decomposition_data).mark_line(color='darkgreen').encode(
-                    x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-                    y=alt.Y('trend', title='Tendência')
-                ).properties(width=500, height=300)
+                    trend_chart = alt.Chart(decomposition_data).mark_line(color='darkgreen').encode(
+                        x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
+                        y=alt.Y('trend', title='Tendência')
+                    ).properties(width=500, height=300)
 
-                seasonal_chart = alt.Chart(decomposition_data).mark_line(color='seagreen').encode(
-                    x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-                    y=alt.Y('seasonal', title='Sazonalidade')
-                ).properties(width=500, height=300)
+                    seasonal_chart = alt.Chart(decomposition_data).mark_line(color='seagreen').encode(
+                        x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
+                        y=alt.Y('seasonal', title='Sazonalidade')
+                    ).properties(width=500, height=300)
 
-                residual_chart = alt.Chart(decomposition_data).mark_line(color='firebrick').encode(
-                    x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-                    y=alt.Y('residual', title='Resíduo')
-                ).properties(width=500, height=300)
+                    residual_chart = alt.Chart(decomposition_data).mark_line(color='firebrick').encode(
+                        x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
+                        y=alt.Y('residual', title='Resíduo')
+                    ).properties(width=500, height=300)
 
-                
-                st.subheader("Tendência")
-                st.altair_chart(trend_chart, use_container_width=True)
-                st.subheader("Sazonalidade")
-                st.altair_chart(seasonal_chart, use_container_width=True)
-                st.subheader("Resíduo")
-                st.altair_chart(residual_chart, use_container_width=True)
+                    st.subheader("Tendência")
+                    st.altair_chart(trend_chart, use_container_width=True)
+                    st.subheader("Sazonalidade")
+                    st.altair_chart(seasonal_chart, use_container_width=True)
+                    st.subheader("Resíduo")
+                    st.altair_chart(residual_chart, use_container_width=True)
+                except Exception as e:
+                    print("")
 
 # Tab: Modelo Machine Learning
 with tabs[3]:
