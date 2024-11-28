@@ -62,7 +62,7 @@ consumo_mundial_df = pd.DataFrame({
         "IEA (International Energy Agency)",
         "IEA (International Energy Agency)",
         "OPEC (Organization of the Petroleum Exporting Countries)",
-        "EIA (Energy Information Administration)"
+        "EIA (Energy Information Administration)"  # Example source for 2024
     ]
 })
 
@@ -187,7 +187,7 @@ with tabs[1]:
             annual_prices = filtered_data.resample('YE').mean().reset_index()
             bar_chart = alt.Chart(annual_prices).mark_bar().encode(
                 x=alt.X('year(data):T', title='Ano', axis=alt.Axis(labelAngle=0), bandPosition=0),
-                y=alt.Y('preco_bpd_US', title='Preço Médio por Litro (USD)')
+                y=alt.Y('preco_bpd_US', title='Preço Médio por Barril (USD)')
             ).properties(
                 width=700,
                 height=400
@@ -258,7 +258,7 @@ with tabs[1]:
 
             price_chart = alt.Chart(merged_df).mark_area(opacity=0.4, color='darkred').encode(
                 x=alt.X('year:O', title='Ano', axis=alt.Axis(labelAngle=0)),
-                y=alt.Y('preco_bpd_US', title='Preço Médio do Petróleo (USD)', axis=alt.Axis(titleColor='darkred'),
+                y=alt.Y('preco_bpd_US', title='Preço Médio por Barril (USD)', axis=alt.Axis(titleColor='darkred'),
                     scale=alt.Scale(domain=[0, merged_df['preco_bpd_US'].max()])),
                     ).properties(width=500, height=302)
 
@@ -386,7 +386,7 @@ with tabs[2]:
                                     labelOffset=10  # Optional: Adjust if labels are too close/far from bars
                                 ),
                                 scale=alt.Scale(domain=list(years_in_data))),  # Use the exact years
-                        y=alt.Y('preco_bpd_US', title='Preço Médio por Litro (USD)'),
+                        y=alt.Y('preco_bpd_US', title='Preço Médio por Barril (USD)'),
                     ).properties(width=500, height=303)
 
                     st.altair_chart(bar_chart, use_container_width=True)
