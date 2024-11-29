@@ -1,4 +1,3 @@
-import prophet
 import joblib
 import pandas as pd
 
