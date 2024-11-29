@@ -80,7 +80,7 @@ class BigQuery:
     def create_dfs(self):
         ipea_df, petroleum_consumption = self.create_querys_and_load_df()
 
-        ipea_df, ipea_avg_per_year = self.prepare_data_price(ipea_df)
+        ipea_df, ipea_avg_per_year = self.prepare_data(ipea_df)
 
         merged_df = pd.merge(ipea_avg_per_year, petroleum_consumption, on='year', how='left')
         
