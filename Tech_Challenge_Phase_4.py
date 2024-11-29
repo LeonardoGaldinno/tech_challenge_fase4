@@ -5,68 +5,15 @@ import altair as alt
 import matplotlib.pyplot as plt
 import seaborn as sns
 from statsmodels.tsa.seasonal import seasonal_decompose
+from database import BigQuery
+from class_prophet import Prophet_model
 
 st.set_page_config(layout="wide")
 
-try:
-    # Carrega secrets do Streamlit
-    project_id = st.secrets["project_id"]
-    private_key = st.secrets["private_key"].replace("\\n", "\n") 
-    client_email = st.secrets["client_email"]
-    
-    # Prepara o Credentials Dictionary
-    credentials = {
-        "type": "service_account",
-        "project_id": project_id,
-        "private_key_id": st.secrets["private_key_id"],
-        "private_key": private_key,
-        "client_email": client_email,
-        "client_id": st.secrets["client_id"],
-        "auth_uri": st.secrets["auth_uri"],
-        "token_uri": st.secrets["token_uri"],
-        "auth_provider_x509_cert_url": st.secrets["auth_provider_x509_cert_url"],
-        "client_x509_cert_url": st.secrets["client_x509_cert_url"],
-    }
-    
-    # Cria o BigQuery client utilizando as credenciais
-    client = bigquery.Client.from_service_account_info(credentials)
-    
-    # Query the data
-    query = """
-    SELECT * FROM `tc-fiap.fase_4.ipea_tratada_final` 
-    WHERE Data > DATE_SUB(CURRENT_DATE(), INTERVAL 5 YEAR)
-    """
+client = BigQuery()
+ipea_df, merged_df = client.create_dfs()
 
-    query2 = """
-    SELECT * FROM `tc-fiap.fase_4.consumo_mundial_petroleo`
-    WHERE Data > DATE_SUB(CURRENT_DATE(), INTERVAL 5 YEAR)
-    """   
-except Exception as e:
-    st.error(f"An error occurred: {e}")
-
-ipea_df = client.query(query).to_dataframe()
-ipea_df = ipea_df.rename(columns={'Preco': 'preco_bpd_US', 'Data': 'data'})
-ipea_df['data'] = pd.to_datetime(ipea_df['data'])
-ipea_df = ipea_df.set_index('data').asfreq('D')
-ipea_df = ipea_df.fillna(method='bfill')
-ipea_df = ipea_df[ipea_df.index <= pd.to_datetime('today')]
-ipea_df['year'] = ipea_df.index.year
-ipea_avg_per_year = ipea_df.groupby('year')['preco_bpd_US'].mean().reset_index()
-
-consumo_mundial_df = pd.DataFrame({
-    "year": [2024, 2023, 2022, 2021, 2020, 2019],
-    "Consumo": [102.0, 100.0, 99.0, 96.0, 91.0, 100.5],
-    "Fontes": [
-        "EIA (Energy Information Administration)",
-        "EIA (Energy Information Administration)",
-        "IEA (International Energy Agency)",
-        "IEA (International Energy Agency)",
-        "OPEC (Organization of the Petroleum Exporting Countries)",
-        "EIA (Energy Information Administration)"  # Example source for 2024
-    ]
-})
-
-merged_df = pd.merge(ipea_avg_per_year, consumo_mundial_df, on='year', how='left')
+model = Prophet_model()
 
 # Create tabs
 tabs = st.tabs(["Introdução", "Relatório", "Dashboard", "Modelo Machine Learning"])
@@ -464,5 +411,55 @@ with tabs[2]:
 
 # Tab: Modelo Machine Learning
 with tabs[3]:
-    st.header("Modelo Machine Learning")
-    st.write("""Aqui será apresentado o modelo de Machine Learning.""")
+    st.header("""Modelo Machine Learning""")
+    st.write("""Demonstração prática do modelo Prophet, treinado com dados históricos até 24/07/2024.""")
+
+    max_date = st.date_input('Selecione a data limite para as previsões', min_value=pd.to_datetime('2024-07-25'))
+    
+    if end_date:
+        if st.button(label='Fazer previsão'):
+
+            prediction_df, data_range = model.make_df_and_predict(max_date=max_date)
+
+            st.write("Previsão do preço em US$ para os próximos {} dias:".format(data_range))
+
+            col1, col2 = st.columns([1,3])
+            with col1:
+                
+                st.subheader("Previsões Geradas")
+                st.write(prediction_df[['ds', 'yhat']])
+
+            with col2:
+
+
+                marker_date = '2024-07-24'
+
+                line_chart = alt.Chart(prediction_df.reset_index()).mark_line().encode(
+                    x=alt.X('ds:T', title='yhat', axis=alt.Axis(format='%d/%m/%Y', tickCount='day')),
+                    y=alt.Y('yhat:Q', title='Preço Previsto (USD)') 
+                ).properties(
+                    width=700,
+                    height=400
+                )
+
+                marker = alt.Chart(pd.DataFrame({'ds': [marker_date]})).mark_rule(color='red').encode(
+                    x='ds:T'
+                )
+
+                marker_text = alt.Chart(pd.DataFrame({'ds': [marker_date], 'yhat': [prediction_df.loc[prediction_df['ds'] == marker_date, 'yhat'].values[0]]})).mark_text(
+                    align='right',
+                    baseline='bottom',
+                    color='white',
+                    fontSize=12
+                ).encode(
+                    x='ds:T',
+                    y=alt.Y('yhat:Q'),
+                    text=alt.value('Limite dos Dados de Treino')
+                )
+
+                final_chart = line_chart + marker + marker_text
+
+                st.subheader("Visualização gráfica das previsões geradas.")
+                st.altair_chart(final_chart, use_container_width=True)
+
+
