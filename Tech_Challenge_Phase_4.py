@@ -307,7 +307,7 @@ with tabs[2]:
             years = filtered_data.index.year.unique()
             selected_years = st.multiselect("Selecione o Ano", options=years, default=years.tolist())
             if not selected_years:
-                st.warning("At least one year must be selected.")
+                st.warning("Selecione pelo menos um ano.")
                 selected_years = years.tolist()
             filtered_data = filtered_data[filtered_data.index.year.isin(selected_years)]
             filtered_merged_df = filtered_merged_df[filtered_merged_df['year'].isin(selected_years)]
