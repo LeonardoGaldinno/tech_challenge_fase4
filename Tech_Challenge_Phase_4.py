@@ -116,7 +116,7 @@ with tabs[1]:
             A sazonalidade pode ser causada por fatores como mudanças climáticas, feriados, eventos sazonais ou flutuações na demanda.
             """)
 
-            st.subheader("Resíduo")
+            st.subheader("ruído")
             st.altair_chart(residual_chart, use_container_width=True)
 
             st.write("""**Análise de Ruído:** O ruído representa as flutuações aleatórias e imprevisíveis nos dados dos preços do petróleo. 
@@ -424,14 +424,14 @@ with tabs[2]:
 
                     residual_chart = alt.Chart(decomposition_data).mark_line(color='firebrick').encode(
                         x=alt.X('data:T', title='Data', axis=alt.Axis(format='%Y-%m', tickCount='month')),
-                        y=alt.Y('residual', title='Resíduo')
+                        y=alt.Y('residual', title='ruído')
                     ).properties(width=500, height=300)
 
                     st.subheader("Tendência")
                     st.altair_chart(trend_chart, use_container_width=True)
                     st.subheader("Sazonalidade")
                     st.altair_chart(seasonal_chart, use_container_width=True)
-                    st.subheader("Resíduo")
+                    st.subheader("ruído")
                     st.altair_chart(residual_chart, use_container_width=True)
                 except Exception as e:
                     print("")
