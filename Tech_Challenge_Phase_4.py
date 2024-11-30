@@ -227,20 +227,47 @@ with tabs[1]:
 
             st.header("Modelo Machine Learning")
             st.write("""Criamos um modelo de Machine Learning especializado em séries temporais para prever os preços do petróleo diariamente. 
-            Incluímos uma análise de desempenho do modelo e as previsões geradas, demonstrando a eficácia e a aplicabilidade prática do nosso trabalho. O modelo que trouxe uma melhor previsao foi o prophet, usando uma base de dados de 5 anos.""")
+            Incluímos uma análise de desempenho do modelo e as previsões geradas, demonstrando a eficácia e a aplicabilidade prática do nosso trabalho. O modelo que trouxe uma melhor previsão foi o prophet, usando uma base de dados de 5 anos.""")
 
             st.write("""O resultado deste projeto é uma combinação de visualizações interativas e previsões precisas que oferecem uma visão 
             abrangente do mercado de petróleo com insights adicionados em um relatório. As informações detalhadas sobre a análise de dados, o dashboard interativo e o 
             modelo de Machine Learning estão disponíveis em suas respectivas abas: Relatório, Dashboard e Modelo Machine Learning.""")
 
             st.header("Conclusão")
-            st.write("""Com base na exploração dos dados, podemos concluir o seguinte:
-            - Insight 1
-            - Insight 2
-            - Insight 3
-            - Insight 4
+            
+            st.write("""
+            A evolução dos preços do petróleo entre 2019 e 2024 reflete o impacto de fatores econômicos e sociais significativos, como a pandemia da COVID-19 e a recuperação econômica.
+            A queda em 2020 destaca a vulnerabilidade do mercado de petróleo a impactos externos, enquanto a recuperação gradual a partir de 2021 ilustra a resiliência e a capacidade de ajuste do mercado às mudanças na demanda global.
+            O impacto da pandemia da COVID-19 em 2020 resultou em uma queda acentuada nos preços, seguida por uma alta significativa em 2021, atingindo um recorde em 2022. Nos anos seguintes, observa-se um leve recuo nos preços, ainda refletindo a recuperação econômica global e ajustes na produção. 
+            Esse padrão destaca a importância de monitorar eventos externos e suas influências para antecipar tendências e planejar estratégias no setor de petróleo.
             """)
 
+            st.write("""
+            A variação sazonal nos preços é essencial para compreender os padrões recorrentes do mercado e melhorar a precisão das previsões econômicas. 
+            Fatores como mudanças climáticas, feriados e eventos específicos têm um impacto nas flutuações sazonais, influenciando a demanda e os preços de forma previsível.
+            """)
+            
+            st.write("""
+            O ruído nos dados, representado por flutuações imprevisíveis, reflete a influência de eventos inesperados que impactam o mercado de petróleo de forma aleatória.
+            A identificação de períodos com maior volatilidade, como observado em abril de 2022, é importante para entender as dinâmicas do mercado e gerenciar os riscos associados 
+            a essas variações.
+            O maior índice de ruído no primeiro trimestre de 2022 ocorre devido ao início da guerra entre Russia e Ucrânia. A pressão em cima dos preços do petróleo e do gás 
+            natural vem como consequência do conflito, da limitação da oferta dessas commodities, os baixos níveis de armazenamento de gás na Europa e a dificuldade prática que 
+            o continente tem de substituir o gás russo no curto prazo. De acordo com os dados da UOL, depois de duas semanas do início do conflito, o preço do petróleo subiu 20%.
+            """)
+            
+            st.write("""
+            Na análise de volatilidade dos preços do petróleo ao longo dos últimos cinco anos é uma ferramenta essencial para entender os níveis de risco e estabilidade no mercado.
+            Períodos de alta volatilidade oferecem potencial para maiores retornos, mas também apresentam riscos elevados, enquanto períodos de baixa volatilidade são mais indicados para investidores que priorizam segurança e estabilidade.
+            Ao identificar esses padrões, os investidores podem alinhar suas estratégias de acordo com seu perfil de risco, maximizando oportunidades e minimizando perdas em um mercado dinâmico como o de petróleo.
+            """)
+            
+            st.write("""
+            Contudo, concluímos que o consumo mundial de petróleo apresenta estabilidade ao longo dos anos, independentemente das variações nos preços. 
+            O modelo e os gráficos no dashboard apresentam insights importantes que podem auxiliar nas previsões dos preços nos próximos anos, porém, conforme citado anteriormente,
+            fatores externos que não podem ser previstos geram uma grande variação no preço do petróleo.
+            """)
+                    
 with tabs[2]:
     with st.container():
         col_dash, col_filters = st.columns([5, 1])
