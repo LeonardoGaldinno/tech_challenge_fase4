@@ -226,12 +226,12 @@ with tabs[1]:
             """)
 
             st.header("Modelo Machine Learning")
-            st.write("""O modelo de Machine Learning foi desenvolvido para prever os preços do petróleo com base em dados históricos.
-            Utilizamos o modelo X especializado em séries temporais para capturar padrões e tendências nos dados e gerar previsões precisas.
-            O modelo foi treinado com um conjunto de dados históricos e validado com dados de teste para garantir sua eficácia e precisão.
-            As previsões geradas pelo modelo são apresentadas em um gráfico interativo, permitindo uma análise mais detalhada dos resultados.
-            Os graficos de sazonalidade, tendência e resíduo auxiliaram na construção do modelo de Machine Learning, 
-            pois permitiram identificar padrões e tendências nos dados que foram utilizados para treinar o modelo.""")
+            st.write("""Criamos um modelo de Machine Learning especializado em séries temporais para prever os preços do petróleo diariamente. 
+            Incluímos uma análise de desempenho do modelo e as previsões geradas, demonstrando a eficácia e a aplicabilidade prática do nosso trabalho. O modelo que trouxe uma melhor previsao foi o prophet, usando uma base de dados de 5 anos.""")
+
+            st.write("""O resultado deste projeto é uma combinação de visualizações interativas e previsões precisas que oferecem uma visão 
+            abrangente do mercado de petróleo com insights adicionados em um relatório. As informações detalhadas sobre a análise de dados, o dashboard interativo e o 
+            modelo de Machine Learning estão disponíveis em suas respectivas abas: Relatório, Dashboard e Modelo Machine Learning.""")
 
             st.header("Conclusão")
             st.write("""Com base na exploração dos dados, podemos concluir o seguinte:
