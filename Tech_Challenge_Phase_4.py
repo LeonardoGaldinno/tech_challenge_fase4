@@ -373,9 +373,9 @@ with tabs[2]:
 
             seasonality_options = ["Yearly", "Monthly"]
             seasonality_choice = st.selectbox(
-                "Selecione o Período de Sazonalidade",
+                "Selecione o Período para a Decomposição Sazonal",
                 seasonality_options,
-                index=0  # Default to "Yearly"
+                index=1
             )
 
             if seasonality_choice == "Yearly":
