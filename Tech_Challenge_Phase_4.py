@@ -392,7 +392,7 @@ with tabs[2]:
             st.markdown(f"**Anos Selecionados:** {', '.join(map(str, selected_years))}")
             st.markdown(f"**Meses Selecionados:** {', '.join(map(str, selected_months))}")
             st.markdown(f"**Janela para Média Móvel de Volatilidade:** {volatility_window} meses")
-            st.markdown(f"**Período para a Decomposição Sazonal:** {(map(str, seasonality_choice))}")
+            st.markdown(f"**Período da Decomposição Sazonal:** {seasonality_choice}")
 
         with col_dash:
             st.header("Dashboard")
