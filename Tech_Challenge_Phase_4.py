@@ -371,6 +371,18 @@ with tabs[2]:
             monthly_volatility_data = filtered_data['preco_bpd_US'].resample('ME').std().reset_index()
             monthly_volatility_data['volatility_moving_avg'] = monthly_volatility_data['preco_bpd_US'].rolling(window=volatility_window).mean()
 
+            seasonality_options = ["Yearly", "Monthly"]
+            seasonality_choice = st.selectbox(
+                "Selecione o Período de Sazonalidade",
+                seasonality_options,
+                index=0  # Default to "Yearly"
+            )
+
+            if seasonality_choice == "Yearly":
+                period = 365 
+            else:
+                period = 12
+
             st.write(f"Janela para Média Móvel de Volatilidade: {volatility_window} meses")
 
             st.subheader("Filtros Aplicados:")
@@ -457,7 +469,7 @@ with tabs[2]:
             with col5:
                 try:
                     filtered_data = filtered_data.dropna(subset=['preco_bpd_US'])
-                    decomposition = seasonal_decompose(filtered_data['preco_bpd_US'], model='additive', period=12)
+                    decomposition = seasonal_decompose(filtered_data['preco_bpd_US'], model='additive', period=period)
                     decomposition_data = pd.DataFrame({
                         'data': filtered_data.index,
                         'trend': decomposition.trend,
