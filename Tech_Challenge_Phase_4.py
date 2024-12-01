@@ -373,7 +373,7 @@ with tabs[2]:
 
             seasonality_options = ["Anual", "Mensal"]
             seasonality_choice = st.selectbox(
-                "Selecione o Período para a Decomposição Sazonal",
+                "Período da Decomposição Sazonal (Aplicável para Gráficos de Tendência, Sazonalidade e Ruído)",
                 seasonality_options,
                 index=1
             )
