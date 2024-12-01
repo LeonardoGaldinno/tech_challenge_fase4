@@ -371,14 +371,14 @@ with tabs[2]:
             monthly_volatility_data = filtered_data['preco_bpd_US'].resample('ME').std().reset_index()
             monthly_volatility_data['volatility_moving_avg'] = monthly_volatility_data['preco_bpd_US'].rolling(window=volatility_window).mean()
 
-            seasonality_options = ["Yearly", "Monthly"]
+            seasonality_options = ["Anual", "Mensal"]
             seasonality_choice = st.selectbox(
                 "Selecione o Período para a Decomposição Sazonal",
                 seasonality_options,
                 index=1
             )
 
-            if seasonality_choice == "Yearly":
+            if seasonality_choice == "Anual":
                 period = 365 
             else:
                 period = 12
