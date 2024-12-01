@@ -108,7 +108,7 @@ with tabs[1]:
             
             st.header("Análise Exploratória de Dados")
             ipea_df = ipea_df.dropna(subset=['preco_bpd_US'])
-            decomposition = seasonal_decompose(ipea_df['preco_bpd_US'], model='additive', period=12)
+            decomposition = seasonal_decompose(ipea_df['preco_bpd_US'], model='additive', period=365)
             decomposition_data = pd.DataFrame({
                 'data': ipea_df.index,
                 'trend': decomposition.trend,
@@ -457,7 +457,7 @@ with tabs[2]:
             with col5:
                 try:
                     filtered_data = filtered_data.dropna(subset=['preco_bpd_US'])
-                    decomposition = seasonal_decompose(filtered_data['preco_bpd_US'], model='additive', period=12)
+                    decomposition = seasonal_decompose(filtered_data['preco_bpd_US'], model='additive', period=365)
                     decomposition_data = pd.DataFrame({
                         'data': filtered_data.index,
                         'trend': decomposition.trend,
