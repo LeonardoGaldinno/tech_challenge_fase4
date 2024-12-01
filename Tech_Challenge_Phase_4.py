@@ -8,6 +8,42 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from database import BigQuery
 from class_prophet import Prophet_model
 
+
+model_code = """# Base de treino e validação (Série Não Estacionária)
+treino = df_base[df_base['ds'] < '2024-07-24']
+valid_e = df_base.loc[(df_base['ds'] >= '2024-07-24') & (df_base['ds'] <= '2024-10-21')]
+h = valid_e['ds'].nunique()
+
+# Prophet
+prophet_object = Prophet(interval_width=0.9)
+prophet_object.fit(treino)
+df_future = prophet_object.make_future_dataframe(periods=(pd.to_datetime('2030-06-30') - df_base['ds'].max()).days, freq='D')
+df_forecast = prophet_object.predict(df_future)
+forecast_prophet = df_forecast.merge(df_base, on=['ds'], how='left')
+
+# Calcular métricas
+y_test = valid_e['y'].values
+y_pred = forecast_prophet[forecast_prophet['ds'].isin(valid_e['ds'])]['yhat'].values
+
+wmape = np.sum(np.abs(y_test - y_pred)) / np.sum(y_test) * 100
+mae = mean_absolute_error(y_test, y_pred)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+
+print(f"WMAPE: {wmape:.2f}%")
+print(f"MAE: {mae:.2f}")
+print(f"RMSE: {rmse:.2f}")
+
+
+# Plotar previsões futuras
+    plt.figure(figsize=(14, 5))
+    plt.plot(df_base['ds'], df_base['y'], color='blue', label='Dados Históricos')
+    plt.plot(forecast_prophet['ds'], forecast_prophet['yhat'], color='red', label='Previsões Prophet')
+    plt.title('Previsões de Preços até 2024 usando Prophet')
+    plt.xlabel('Data')
+    plt.ylabel('Preço')
+    plt.legend()
+    plt.show()"""
+
 st.set_page_config(layout="wide")
 
 client = BigQuery()
@@ -226,8 +262,22 @@ with tabs[1]:
             """)
 
             st.header("Modelo Machine Learning")
-            st.write("""Criamos um modelo de Machine Learning especializado em séries temporais para prever os preços do petróleo diariamente. 
-            Incluímos uma análise de desempenho do modelo e as previsões geradas, demonstrando a eficácia e a aplicabilidade prática do nosso trabalho. O modelo que trouxe uma melhor previsão foi o prophet, usando uma base de dados de 5 anos.""")
+            st.write("""Criamos um modelo de Machine Learning para séries temporais visando prever os preços do petróleo Brent diariamente. 
+            Incluímos uma análise de desempenho do modelo e as previsões geradas, demonstrando a eficácia e a aplicabilidade prática do nosso trabalho. O modelo que trouxe uma melhor previsão foi o prophet.
+            """)
+            st.write("O modelo foi treinado a partir de uma base de 5 anos, e avaliado com as métricas:")
+            st.write("MAE: 7.68")
+            st.write("RMSE:8.52")
+            st.write("WMAPE: 9.91%")
+                
+            st.write("As métricas indicam um bom desempenho, com erros médios inferiores a 10 unidades (na mesma escala dos dados), controle sobre os erros maiores e uma precisão elevada, já que o erro médio corresponde a menos de 10% dos valores reais.")
+
+            st.write("O código de treino, teste e avaliação está disponível abaixo:")
+            
+            st.code(model_code, language="python")
+
+            st.write
+
 
             st.write("""O resultado deste projeto é uma combinação de visualizações interativas e previsões precisas que oferecem uma visão 
             abrangente do mercado de petróleo com insights adicionados em um relatório. As informações detalhadas sobre a análise de dados, o dashboard interativo e o 
