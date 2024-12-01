@@ -276,7 +276,7 @@ with tabs[1]:
             
             st.code(model_code, language="python")
 
-            st.write
+            #st.write
 
 
             st.write("""O resultado deste projeto é uma combinação de visualizações interativas e previsões precisas que oferecem uma visão 
