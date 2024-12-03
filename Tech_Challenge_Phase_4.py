@@ -8,6 +8,19 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from database import BigQuery
 from class_prophet import Prophet_model
 
+# Baixar dados históricos do DXY e da taxa de juros de 10 anos
+dxy_data = yf.download("DX-Y.NYB", start="2019-01-01", end="2024-12-31")
+treasury_yield_data = yf.download("^TNX", start="2019-01-01", end="2024-12-31")
+
+# Selecionar o fechamento diário para análise e renomear as colunas
+dxy = pd.Series(dxy_data['Close'].values.squeeze(), name="indice_dolar_eua_dxy")
+treasury_yield = pd.Series(treasury_yield_data['Close'].values.squeeze(), name="tx_juros_eua")
+
+# Combinar os dados em um único DataFrame
+df_yfinance = pd.concat([dxy, treasury_yield], axis=1)
+
+# Definir o índice como a data do DXY
+df_yfinance.index = dxy_data.index # dxy_data contains the DatetimeIndex
 
 model_code = """# Base de treino e validação (Série Não Estacionária)
 treino = df_base[df_base['ds'] < '2024-07-24']
@@ -215,14 +228,18 @@ with tabs[1]:
 
             col1, col2, col3 = st.columns(3)
 
+            m_price_p = round(float(ipea_df['preco_bpd_US'].mean()),2)
+            m_dxy_eua = round(float(df_yfinance['indice_dolar_eua_dxy'].mean()),2)
+            m_tx_eua = round(float(df_yfinance['tx_juros_eua'].mean()),2)
+
             with col1:
-                st.metric(label="Preço Médio do Petróleo", value="R$ 105,90", delta="10%")
+                st.metric(label="Preço Médio do Petróleo", value=f"${m_price_p:,.2f}".replace('.', ','))
                 
             with col2:
-                st.metric(label="Tx Juros Americano", value="5,2%", delta="+25%")
+                st.metric(label="Média da Tx Juros Americano", value=f"{m_tx_eua:.2f}%".replace('.', ','))
                 
             with col3:
-                st.metric(label="Indice Dólar Americano", value="101.789", delta="15%")
+                st.metric(label="Média do Indice Dólar Americano", value=m_dxy_eua)
 
 
             st.write("""- **Taxa de Juros dos EUA:** A taxa de juros afeta o consumo, pois custos de empréstimos mais altos tornam o crédito mais caro. 
@@ -399,14 +416,20 @@ with tabs[2]:
             
             col1, col2, col3 = st.columns(3)
 
+            df_petroleo = ipea_df[(ipea_df.index >= start_date) & (ipea_df.index <= end_date)]
+            df_yfinance_filter = df_yfinance[(df_yfinance.index >= start_date) & (df_yfinance.index <= end_date)]
+            m_price_p = round(float(df_petroleo['preco_bpd_US'].mean()),2)
+            m_dxy_eua = round(float(df_yfinance_filter['indice_dolar_eua_dxy'].mean()),2)
+            m_tx_eua = round(float(df_yfinance_filter['tx_juros_eua'].mean()),2)
+
             with col1:
-                st.metric(label="Preço Médio do Petróleo", value="R$ 105,90", delta="10%")
+                st.metric(label="Preço Médio do Petróleo", value=f"${m_price_p:,.2f}".replace('.', ','))
                 
             with col2:
-                st.metric(label="Tx Juros Americano", value="5,2%", delta="+25%")
+                st.metric(label="Média da Tx Juros Americano", value=f"{m_tx_eua:.2f}%".replace('.', ','))
                 
             with col3:
-                st.metric(label="Indice Dólar Americano", value="101.789", delta="15%")
+                st.metric(label="Média do Indice Dólar Americano", value=m_dxy_eua)
             
 
             col4, col5 = st.columns(2)
