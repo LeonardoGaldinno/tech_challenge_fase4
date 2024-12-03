@@ -110,9 +110,11 @@ with tabs[1]:
             st.write("""
             Para este projeto, utilizamos dados históricos de preços do petróleo brent, que são fornecidos pelo site do Instituto de Pesquisa 
             Econômica Aplicada (IPEA), como também dados de consumo mundial de petróleo de fontes como: Energy Information Administration (EIA), 
-            International Energy Agency (IEA) e Organization of the Petroleum Exporting Countries (OPEC).
-     
-            Esses dados incluem informações sobre as datas, os preços e a média diária do consumo de petróleo ao longo do tempo. 
+            International Energy Agency (IEA) e Organization of the Petroleum Exporting Countries (OPEC). Esses dados incluem informações sobre as datas, 
+            os preços e a média diária do consumo de petróleo ao longo do tempo. Além disso, utilizamos dados da biblioteca 
+            YFinance no Python para buscar informações adicionais referentes ao preço médio do petróleo, à taxa de juros americana e à média do índice do 
+            dólar americano, que são fatores fundamentais para enriquecer nossas análises.
+            
             Para garantir que os dados estejam bem organizados e facilmente acessíveis, armazenamos tudo no BigQuery, uma plataforma de 
             armazenamento de dados na nuvem. Isso não só facilita a estruturação dos dados, mas também permite que eles sejam integrados 
             automaticamente com o Streamlit, a ferramenta que usamos para criar nosso dashboard interativo e o modelo de previsão. 
@@ -224,7 +226,7 @@ with tabs[1]:
             st.subheader("Análise de Key Performance Indicators (KPIs)")
 
             st.write("""A taxa de juros dos Estados Unidos da América (EUA) e o preço do dólar são dois fatores importantes que influenciam os preços do petróleo.
-            Os gráficos abaixo mostram a cotização do dólar e a taxa de juros dos EUA. 
+            Os gráficos abaixo mostram a média da cotização do dólar e a taxa de juros dos EUA ao longo de aproximadamente 5 anos. 
             """)
 
             col1, col2, col3 = st.columns(3)
