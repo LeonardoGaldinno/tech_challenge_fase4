@@ -194,7 +194,7 @@ with tabs[1]:
 
             st.altair_chart(bar_chart, use_container_width=True)
             
-            st.write("""**Análise do Preço Médio por Litro:** Ao analisar o gráfico de barras da variação anual dos preços do petróleo, 
+            st.write("""**Análise do Preço Médio por Barril:** Ao analisar o gráfico de barras da variação anual dos preços do petróleo, 
             podemos identificar anos específicos em que houve aumentos ou quedas significativas nos preços médios. Esses picos ou quedas podem estar associados a eventos econômicos ou 
             geopolíticos importantes, como mudanças na produção de petróleo, conflitos internacionais ou flutuações na demanda global. 
             Monitorar esses eventos pode ajudar a prever futuras variações nos preços.
