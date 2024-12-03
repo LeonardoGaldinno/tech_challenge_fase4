@@ -327,7 +327,7 @@ with tabs[1]:
             """)
             
             st.write("""
-            Na análise de volatilidade dos preços do petróleo ao longo dos últimos cinco anos é uma ferramenta essencial para entender os níveis de risco e estabilidade no mercado.
+            A análise de volatilidade dos preços do petróleo ao longo dos últimos cinco anos é uma ferramenta essencial para entender os níveis de risco e estabilidade no mercado.
             Períodos de alta volatilidade oferecem potencial para maiores retornos, mas também apresentam riscos elevados, enquanto períodos de baixa volatilidade são mais indicados para investidores que priorizam segurança e estabilidade.
             Ao identificar esses padrões, os investidores podem alinhar suas estratégias de acordo com seu perfil de risco, maximizando oportunidades e minimizando perdas em um mercado dinâmico como o de petróleo.
             """)
