@@ -554,5 +554,3 @@ with tabs[3]:
 
                 st.subheader("Visualização gráfica das previsões geradas.")
                 st.altair_chart(final_chart, use_container_width=True)
-
-
