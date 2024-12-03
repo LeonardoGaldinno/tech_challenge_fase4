@@ -7,6 +7,7 @@ import seaborn as sns
 from statsmodels.tsa.seasonal import seasonal_decompose
 from database import BigQuery
 from class_prophet import Prophet_model
+import yfinance as yf
 
 # Baixar dados históricos do DXY e da taxa de juros de 10 anos
 dxy_data = yf.download("DX-Y.NYB", start="2019-01-01", end="2024-12-31")
