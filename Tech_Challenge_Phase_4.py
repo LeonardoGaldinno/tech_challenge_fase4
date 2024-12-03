@@ -226,7 +226,7 @@ with tabs[1]:
             st.subheader("Análise de Key Performance Indicators (KPIs)")
 
             st.write("""A taxa de juros dos Estados Unidos da América (EUA) e o preço do dólar são dois fatores importantes que influenciam os preços do petróleo.
-            Os gráficos abaixo mostram a média da cotização do dólar e a taxa de juros dos EUA ao longo de aproximadamente 5 anos. 
+            Os gráficos abaixo mostram a média da cotização do dólar e a taxa de juros dos EUA ao longo dos últimos 5 anos. 
             """)
 
             col1, col2, col3 = st.columns(3)
